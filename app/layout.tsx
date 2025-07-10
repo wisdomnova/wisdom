@@ -60,10 +60,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${sora.className} bg-white text-gray-900 antialiased`}>
+        <GoogleAnalytics gaId="G-HLKJTTP7MJ" />
         <Header />
         <main>{children}</main>
         <Footer />
-        <GoogleAnalytics gaId="G-HLKJTTP7MJ" />
       </body>
     </html>
   );
