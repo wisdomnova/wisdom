@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "your-google-verification-code",
+    google: "f27AeNXGZcI-1Wnd7Bbq6PDyHbkvz-PEFpG8Ss6Mxo4",
   },
   other: {
     // Social media profiles for rich snippets
