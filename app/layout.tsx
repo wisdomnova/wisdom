@@ -3,6 +3,7 @@ import { Sora } from "next/font/google";
 import { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const sora = Sora({ subsets: ["latin"] });
 
@@ -20,10 +21,10 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/og-image.jpg",
-        width: 1200,
+        width: 1200, 
         height: 630,
         alt: "Wisdom Divine - Full-Stack Developer",
-      },
+      }, 
     ],
     locale: "en_US",
     type: "website",
@@ -62,6 +63,7 @@ export default function RootLayout({
         <Header />
         <main>{children}</main>
         <Footer />
+        <GoogleAnalytics gaId="G-YWX9P6TYP9" />
       </body>
     </html>
   );
