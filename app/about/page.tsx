@@ -34,7 +34,7 @@ const timeline = [
     title: "Software Engineering Intern",
     company: "TRACTRAC",
     description: "Contributing to advanced tracking and analytics systems, gaining experience in enterprise-level development.",
-    current: false
+    current: false 
   },
   {
     year: "2024",
@@ -86,10 +86,11 @@ const values = [
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/wisdomnova", label: "GitHub" },
-  { icon: Linkedin, href: "https://linkedin.com/in/wisdomdivine", label: "LinkedIn" },
-  { icon: Mail, href: "mailto:wisdom@example.com", label: "Email" }
+  { icon: Linkedin, href: "https://www.linkedin.com/in/wisdom-divine-d-85b234237", label: "LinkedIn" },
+  { icon: Mail, href: "mailto:wisdomdivine3d@gmail.com", label: "Email" }
 ];
 
+// ...rest of your component remains exactly the same
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white pt-24">

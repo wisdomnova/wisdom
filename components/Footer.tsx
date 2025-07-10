@@ -14,25 +14,25 @@ const socialLinks = [
   },
   { 
     name: "LinkedIn", 
-    href: "https://linkedin.com/in/wisdomdivine", 
+    href: "https://www.linkedin.com/in/wisdom-divine-d-85b234237", 
     icon: Linkedin,
     color: "hover:text-blue-600"
   },
   { 
     name: "Twitter", 
-    href: "https://twitter.com/wisdomdivine", 
+    href: "https://x.com/wisdom_divine_d", 
     icon: Twitter,
     color: "hover:text-blue-400"
   },
   { 
     name: "Instagram", 
-    href: "https://instagram.com/wisdomdivine", 
+    href: "https://www.instagram.com/wisdom_divine_d", 
     icon: Instagram,
     color: "hover:text-pink-500"
   },
   { 
     name: "Email", 
-    href: "mailto:wisdom@example.com", 
+    href: "mailto:wisdomdivine3d@gmail.com", 
     icon: Mail,
     color: "hover:text-emerald-600"
   }

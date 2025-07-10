@@ -9,8 +9,8 @@ const contactMethods = [
     icon: Mail,
     title: "Email",
     description: "Drop me a line anytime",
-    value: "wisdom@example.com",
-    href: "mailto:wisdom@example.com",
+    value: "wisdomdivine3d@gmail.com",
+    href: "mailto:wisdomdivine3d@gmail.com",
     color: "text-blue-600"
   },
   {
@@ -18,7 +18,7 @@ const contactMethods = [
     title: "Schedule a Call",
     description: "Let's discuss your project",
     value: "Book a meeting",
-    href: "https://calendly.com/wisdomdivine",
+    href: "https://calendly.com/wisdom-divine-d",
     color: "text-green-600"
   },
   {
@@ -41,20 +41,20 @@ const socialLinks = [
   {
     icon: Linkedin,
     name: "LinkedIn",
-    href: "https://linkedin.com/in/wisdomdivine",
-    username: "/in/wisdomdivine"
+    href: "https://www.linkedin.com/in/wisdom-divine-d-85b234237",
+    username: "/in/wisdom-divine-d-85b234237"
   },
   {
     icon: Twitter,
     name: "Twitter",
-    href: "https://twitter.com/wisdomdivine",
-    username: "@wisdomdivine"
+    href: "https://x.com/wisdom_divine_d",
+    username: "@wisdom_divine_d"
   },
   {
     icon: Instagram,
     name: "Instagram",
-    href: "https://instagram.com/wisdomdivine",
-    username: "@wisdomdivine"
+    href: "https://www.instagram.com/wisdom_divine_d",
+    username: "@wisdom_divine_d"
   }
 ];
 
