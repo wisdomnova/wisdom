@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Wisdom Divine - Full-Stack Developer",
     description: "Full-stack developer specializing in React, Next.js, React Native, and backend systems. Building exceptional digital experiences.",
-    url: "https://wisdomdivine.dev",
+    url: "https://wisdom-divine.vercel.app/",
     siteName: "Wisdom Divine Portfolio",
     images: [
       {
