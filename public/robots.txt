@@ -1,0 +1,5 @@
+<!-- filepath: /Users/user/wisdom/public/robots.txt -->
+User-agent: *
+Allow: /
+
+Sitemap: https://wisdom-divine.vercel.app/sitemap.xml
