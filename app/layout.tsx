@@ -157,7 +157,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${sora.className} bg-white text-gray-900 antialiased`}>
-        <GoogleAnalytics gaId="G-HLKJTTP7MJ" />
+        <GoogleAnalytics gaId="G-RY3WTC7Y6Y" />
         <Header />
         <main>{children}</main>
         <Footer />
