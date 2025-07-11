@@ -95,6 +95,22 @@ const faqs = [
   }
 ];
 
+// Predefined static particle positions to prevent hydration issues
+const staticParticleData = [
+  { left: 15.5, top: 25.3, delay: 2.1 },
+  { left: 73.2, top: 45.8, delay: 5.7 },
+  { left: 32.1, top: 78.9, delay: 1.4 },
+  { left: 87.6, top: 12.7, delay: 8.2 },
+  { left: 9.8, top: 65.4, delay: 3.9 },
+  { left: 54.3, top: 89.1, delay: 6.3 },
+  { left: 41.7, top: 35.6, delay: 0.8 },
+  { left: 78.9, top: 58.2, delay: 7.1 },
+  { left: 23.4, top: 14.5, delay: 4.6 },
+  { left: 65.8, top: 82.3, delay: 2.9 },
+  { left: 91.2, top: 39.7, delay: 9.4 },
+  { left: 7.6, top: 71.8, delay: 1.7 }
+];
+
 export default function ContactPage() {
   const [form, setForm] = useState({ 
     name: "", 
@@ -103,34 +119,46 @@ export default function ContactPage() {
     message: "" 
   });
   const [status, setStatus] = useState<string | null>(null);
-
-  // Generate deterministic random values for particles to fix hydration issue
-  const particleData = useMemo(() => {
-    // Simple seeded random function for consistent values
-    const seededRandom = (seed: number) => {
-      const x = Math.sin(seed) * 10000;
-      return x - Math.floor(x);
-    };
-
-    return Array.from({ length: 12 }, (_, i) => ({
-      left: seededRandom(i * 2) * 100,
-      top: seededRandom(i * 2 + 1) * 100,
-      delay: seededRandom(i * 3) * 10,
-    }));
-  }, []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
     setStatus("loading");
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send message');
+      }
+
       setStatus("success");
       setForm({ name: "", email: "", subject: "", message: "" });
       
       // Clear success message after 5 seconds
       setTimeout(() => setStatus(null), 5000);
-    }, 2000);
+
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setStatus("error");
+      
+      // Clear error message after 5 seconds
+      setTimeout(() => setStatus(null), 5000);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -155,9 +183,9 @@ export default function ContactPage() {
           }}
         />
         
-        {/* Floating particles with deterministic positions */}
+        {/* Floating particles with static positions */}
         <div className="absolute inset-0">
-          {particleData.map((particle, i) => (
+          {staticParticleData.map((particle, i) => (
             <div
               key={i}
               className={`absolute w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-15 animate-float-particle-${i % 3}`}
@@ -218,10 +246,68 @@ export default function ContactPage() {
           </div>
         </motion.section>
 
+        {/* Contact Methods */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center"
+        >
+          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-900">
+            Choose Your <span className="gradient-text">Preferred Way</span>
+          </h2>
+          <p className="text-gray-600 mb-12 max-w-2xl mx-auto">
+            Pick the communication method that works best for you. I'm here to help however you'd like to connect.
+          </p>
 
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {contactMethods.map((method, index) => {
+              const Icon = method.icon;
+              const content = (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group relative p-8 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl hover:shadow-2xl hover:bg-white transition-all duration-500 hover-glow overflow-hidden cursor-pointer min-h-[280px] flex flex-col justify-between"
+                >
+                  {/* Floating particles */}
+                  <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-0 group-hover:opacity-100 animate-float-particle-0 transition-opacity duration-300"></div>
+                  
+                  <div className="flex-1 flex flex-col items-center text-center">
+                    <div className={`w-16 h-16 ${method.bgColor} rounded-2xl flex items-center justify-center mx-auto mb-6 border ${method.borderColor} group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon size={24} className={`${method.color} group-hover:scale-110 transition-transform duration-300`} />
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+                      {method.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4 leading-relaxed flex-1">
+                      {method.description}
+                    </p>
+                  </div>
+                  
+                  <div className="mt-auto">
+                    <p className={`font-semibold ${method.color} text-lg break-all text-center px-2`}>
+                      {method.value}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+
+              return method.href ? (
+                <a key={index} href={method.href} target="_blank" rel="noopener noreferrer">
+                  {content}
+                </a>
+              ) : (
+                <div key={index}>{content}</div>
+              );
+            })}
+          </div>
+        </motion.section>
 
         {/* Contact Form */}
-        <motion.section
+        <motion.section 
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -257,7 +343,8 @@ export default function ContactPage() {
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     required
-                    className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 hover-glow"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="John Doe"
                   />
                 </div>
@@ -272,7 +359,8 @@ export default function ContactPage() {
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     required
-                    className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 hover-glow"
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -287,7 +375,8 @@ export default function ContactPage() {
                   type="text"
                   value={form.subject}
                   onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 hover-glow"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="Mobile App Development Project"
                 />
               </div>
@@ -302,17 +391,18 @@ export default function ContactPage() {
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   required
-                  className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 resize-none hover-glow"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 resize-none hover-glow disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="Tell me about your project: What kind of app/website do you need? What's your timeline? What's your budget range? Any specific features or requirements?"
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={status === "loading"}
+                disabled={isSubmitting}
                 className="w-full px-8 py-4 bg-gray-900 rounded-xl font-semibold text-white hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 magnetic"
               >
-                {status === "loading" ? (
+                {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     Sending Message...
