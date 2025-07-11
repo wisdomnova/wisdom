@@ -4,7 +4,8 @@ import { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const sora = Sora({ subsets: ["latin"] });
 
@@ -159,6 +160,7 @@ export default function RootLayout({
       </head>
       <body className={`${sora.className} bg-white text-gray-900 antialiased`}>
         <Analytics/>
+        <SpeedInsights/>
         <GoogleAnalytics gaId="G-RY3WTC7Y6Y" />
         <Header />
         <main>{children}</main>
