@@ -1,133 +1,128 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Calendar, Clock, ArrowUpRight, Tag, Search, Filter, X } from "lucide-react";
+import { Calendar, Clock, ArrowUpRight, Search, X } from "lucide-react";
+import { getBlogs, getBlogCategories, getBlogTags, getFeaturedBlogs } from "@/lib/blogs";
+import { Blog } from "@/types/blog";
 
-const blogPosts = [
-  {
-    id: "my-programming-journey",
-    title: "From Curiosity to Code: My Programming Journey",
-    excerpt: "The story of how I discovered programming and transformed passion into a career in tech.",
-    content: "My personal journey into programming — from the first lines of code to becoming a full-stack developer. The challenges, breakthroughs, and lessons that shaped my path in technology.",
-    href: "/blog/my-programming-journey",
-    date: "2024-12-15",
-    readTime: "8 min read",
-    tags: ["Personal", "Career", "Programming"],
-    category: "Personal",
-    featured: true
-  },
-  {
-    id: "beeseek-digitalizing-services-nigeria",
-    title: "Digitalizing Door-to-Door Services: The BeeSeek Vision",
-    excerpt: "Why Nigeria (and West Africa) needs a trusted platform for home services — and how BeeSeek aims to solve it.",
-    content: "Exploring the massive opportunity in Nigeria's service economy. How digital transformation can connect skilled service providers with customers, creating jobs and improving lives across West Africa.",
-    href: "/blog/beeseek-digitalizing-services-nigeria",
-    date: "2024-12-10",
-    readTime: "12 min read",
-    tags: ["BeeSeek", "Nigeria", "Digital Transformation", "Marketplace"],
-    category: "Entrepreneurship",
-    featured: true
-  },
-  {
-    id: "overcoming-programming-challenges",
-    title: "Overcoming Programming Challenges: Lessons from the Trenches",
-    excerpt: "The technical roadblocks, project setbacks, and debugging nightmares — and how I learned to push through them.",
-    content: "Real stories from my development journey: the bugs that took days to fix, the features that seemed impossible, and the strategies I developed to overcome technical challenges and deliver successful projects.",
-    href: "/blog/overcoming-programming-challenges",
-    date: "2024-12-05",
-    readTime: "10 min read",
-    tags: ["Programming", "Problem Solving", "Career", "Lessons"],
-    category: "Technical",
-    featured: true
-  },
-  {
-    id: "react-native-vs-flutter-2024",
-    title: "React Native vs Flutter: A Developer's Perspective in 2024",
-    excerpt: "Having built apps in both frameworks, here's my honest comparison and when to choose each one.",
-    content: "After building multiple mobile apps with both React Native and Flutter, I share the real-world differences, performance considerations, and decision factors for choosing the right framework for your project.",
-    href: "/blog/react-native-vs-flutter-2024",
-    date: "2024-11-28",
-    readTime: "15 min read",
-    tags: ["React Native", "Flutter", "Mobile Development", "Comparison"],
-    category: "Technical",
-    featured: false
-  },
-  {
-    id: "building-kazamarka-ecommerce-app",
-    title: "Building Kazamarka: Lessons from Creating an E-commerce App",
-    excerpt: "The technical and business challenges of building a cross-border e-commerce platform for the Middle East market.",
-    content: "A deep dive into the development process of Kazamarka, covering payment integration with Stripe, inventory management, localization for Jordan and Saudi Arabia, and the technical decisions that shaped the platform.",
-    href: "/blog/building-kazamarka-ecommerce-app",
-    date: "2024-11-20",
-    readTime: "18 min read",
-    tags: ["E-commerce", "React Native", "Stripe", "Case Study"],
-    category: "Projects",
-    featured: false
-  },
-  {
-    id: "freelancing-as-african-developer",
-    title: "Freelancing as an African Developer: Challenges and Opportunities",
-    excerpt: "The unique challenges and opportunities facing African developers in the global freelance market.",
-    content: "Navigating time zones, building trust with international clients, pricing strategies, and leveraging Africa's growing tech reputation. Real experiences and practical advice for African developers entering the global market.",
-    href: "/blog/freelancing-as-african-developer",
-    date: "2024-11-15",
-    readTime: "12 min read",
-    tags: ["Freelancing", "Africa", "Career", "Business"],
-    category: "Personal",
-    featured: false
-  },
-  {
-    id: "state-management-react-apps-2024",
-    title: "State Management in React Apps: What I Learned the Hard Way",
-    excerpt: "From prop drilling to Redux to Zustand — my evolution in managing state in React applications.",
-    content: "A practical guide to state management patterns in React, covering when to use local state, Context API, Redux, Zustand, and other solutions. Real examples from projects and lessons learned from overengineering.",
-    href: "/blog/state-management-react-apps-2024",
-    date: "2024-11-08",
-    readTime: "14 min read",
-    tags: ["React", "State Management", "Redux", "Zustand"],
-    category: "Technical",
-    featured: false
-  },
-  {
-    id: "african-tech-ecosystem-2024",
-    title: "The African Tech Ecosystem: Where We Are and Where We're Going",
-    excerpt: "Observations on the growth of tech hubs across Africa and opportunities for the next decade.",
-    content: "An analysis of Africa's tech landscape, from fintech innovations to the rise of remote work, venture capital growth, and the potential for African solutions to global problems.",
-    href: "/blog/african-tech-ecosystem-2024",
-    date: "2024-10-30",
-    readTime: "16 min read",
-    tags: ["Africa", "Tech Ecosystem", "Fintech", "Future"],
-    category: "Industry",
-    featured: false
-  }
+// Predefined static particle data to prevent hydration issues
+const staticParticleData = [
+  { left: 15.5, top: 25.3, delay: 2.1 },
+  { left: 73.2, top: 45.8, delay: 5.7 },
+  { left: 32.1, top: 78.9, delay: 1.4 },
+  { left: 87.6, top: 12.7, delay: 8.2 },
+  { left: 9.8, top: 65.4, delay: 3.9 },
+  { left: 54.3, top: 89.1, delay: 6.3 },
+  { left: 41.7, top: 35.6, delay: 0.8 },
+  { left: 78.9, top: 58.2, delay: 7.1 },
+  { left: 23.4, top: 14.5, delay: 4.6 },
+  { left: 65.8, top: 82.3, delay: 2.9 },
+  { left: 91.2, top: 39.7, delay: 9.4 },
+  { left: 7.6, top: 71.8, delay: 1.7 }
 ];
 
-const categories = ["All", "Technical", "Personal", "Entrepreneurship", "Projects", "Industry"];
-const allTags = Array.from(new Set(blogPosts.flatMap(post => post.tags))).sort();
-
 export default function BlogPage() {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [featuredBlogs, setFeaturedBlogs] = useState<Blog[]>([]);
+  const [categories, setCategories] = useState<string[]>(['All']);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredPosts = blogPosts.filter(post => {
-    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => post.tags.includes(tag));
-    
-    return matchesCategory && matchesSearch && matchesTags;
-  });
+  // Load initial data
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const featuredPosts = blogPosts.filter(post => post.featured);
+        const [blogsData, categoriesData, featuredData] = await Promise.all([
+          getBlogs(),
+          getBlogCategories(),
+          getFeaturedBlogs()
+        ]);
+
+        setBlogs(blogsData);
+        setCategories(categoriesData);
+        setFeaturedBlogs(featuredData);
+      } catch (err) {
+        console.error('Error loading blog data:', err);
+        setError('Failed to load blog posts. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  // Filter blogs based on search and category
+  useEffect(() => {
+    async function filterBlogs() {
+      try {
+        const filteredData = await getBlogs({
+          category: selectedCategory,
+          searchTerm: searchTerm.trim() || undefined
+        });
+        setBlogs(filteredData);
+      } catch (err) {
+        console.error('Error filtering blogs:', err);
+      }
+    }
+
+    if (!loading) {
+      filterBlogs();
+    }
+  }, [selectedCategory, searchTerm, loading]);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const formatDateShort = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white pt-24 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading blog posts...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white pt-24 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pt-24 relative overflow-hidden">
-      {/* Enhanced animated background - same as about page */}
+      {/* Enhanced animated background */}
       <div className="fixed inset-0 pointer-events-none">
         {/* Gradient orbs */}
         <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-br from-blue-400/15 to-purple-400/15 rounded-full blur-3xl animate-float"></div>
@@ -147,16 +142,16 @@ export default function BlogPage() {
           }}
         />
         
-        {/* Floating particles */}
+        {/* Floating particles with static positions */}
         <div className="absolute inset-0">
-          {[...Array(12)].map((_, i) => (
+          {staticParticleData.map((particle, i) => (
             <div
               key={i}
               className={`absolute w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-15 animate-float-particle-${i % 3}`}
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 10}s`,
+                left: `${particle.left}%`,
+                top: `${particle.top}%`,
+                animationDelay: `${particle.delay}s`,
               }}
             />
           ))}
@@ -177,7 +172,7 @@ export default function BlogPage() {
             transition={{ delay: 0.2 }}
             className="inline-block px-4 py-2 bg-white/80 backdrop-blur-sm border border-blue-200/50 rounded-full text-blue-700 text-sm font-medium mb-6 hover-glow"
           >
-            Blog • {blogPosts.length} Articles
+            Blog • {blogs.length} Articles
           </motion.div>
           
           <h1 className="text-4xl lg:text-6xl font-bold mb-6 text-gray-900 leading-tight">
@@ -244,7 +239,7 @@ export default function BlogPage() {
                 className="text-center"
               >
                 <p className="text-gray-600">
-                  Found <span className="font-semibold text-blue-600">{filteredPosts.length}</span> article{filteredPosts.length !== 1 ? 's' : ''} 
+                  Found <span className="font-semibold text-blue-600">{blogs.length}</span> article{blogs.length !== 1 ? 's' : ''} 
                   {searchTerm && ` matching "${searchTerm}"`}
                 </p>
               </motion.div>
@@ -253,13 +248,13 @@ export default function BlogPage() {
         </motion.section>
 
         {/* Featured Articles */}
-        {!searchTerm && (
+        {!searchTerm && featuredBlogs.length > 0 && (
           <section>
             <h2 className="text-3xl lg:text-4xl font-bold mb-12 text-center text-gray-900">
               Featured Articles
             </h2>
             <div className="grid lg:grid-cols-2 gap-8 mb-16">
-              {featuredPosts.slice(0, 2).map((post, index) => (
+              {featuredBlogs.slice(0, 2).map((post, index) => (
                 <motion.article
                   key={post.id}
                   initial={{ opacity: 0, y: 50 }}
@@ -279,15 +274,11 @@ export default function BlogPage() {
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
                     <div className="flex items-center gap-1">
                       <Calendar size={14} className="group-hover:text-blue-600 transition-colors duration-300" />
-                      <span>{new Date(post.date).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric', 
-                        year: 'numeric' 
-                      })}</span>
+                      <span>{formatDate(post.published_at || post.created_at)}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock size={14} className="group-hover:text-blue-600 transition-colors duration-300" />
-                      <span>{post.readTime}</span>
+                      <span>{post.read_time}</span>
                     </div>
                     <span className="px-2 py-1 bg-gray-100/80 backdrop-blur-sm text-gray-600 text-xs rounded font-medium border border-gray-200/50">
                       {post.category}
@@ -299,7 +290,7 @@ export default function BlogPage() {
                   </h3>
                   
                   <p className="text-gray-600 mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
-                    {post.content}
+                    {post.excerpt}
                   </p>
 
                   <div className="flex flex-wrap gap-2 mb-6">
@@ -314,7 +305,7 @@ export default function BlogPage() {
                   </div>
 
                   <Link
-                    href={post.href}
+                    href={`/blog/${post.slug}`}
                     className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium group/link"
                   >
                     Read Full Article
@@ -333,11 +324,11 @@ export default function BlogPage() {
               {searchTerm ? 'Search Results' : 'All Articles'}
             </h2>
             <span className="text-gray-500">
-              {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''}
+              {blogs.length} article{blogs.length !== 1 ? 's' : ''}
             </span>
           </div>
 
-          {filteredPosts.length === 0 ? (
+          {blogs.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -348,7 +339,6 @@ export default function BlogPage() {
                 onClick={() => {
                   setSearchTerm("");
                   setSelectedCategory("All");
-                  setSelectedTags([]);
                 }}
                 className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
@@ -357,7 +347,7 @@ export default function BlogPage() {
             </motion.div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredPosts.map((post, index) => (
+              {blogs.map((post, index) => (
                 <motion.article
                   key={post.id}
                   initial={{ opacity: 0, y: 30 }}
@@ -382,14 +372,11 @@ export default function BlogPage() {
                     <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
                       <div className="flex items-center gap-1">
                         <Calendar size={12} className="group-hover:text-blue-600 transition-colors duration-300" />
-                        <span>{new Date(post.date).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}</span>
+                        <span>{formatDateShort(post.published_at || post.created_at)}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock size={12} className="group-hover:text-blue-600 transition-colors duration-300" />
-                        <span>{post.readTime}</span>
+                        <span>{post.read_time}</span>
                       </div>
                     </div>
 
@@ -418,7 +405,7 @@ export default function BlogPage() {
                     </div>
 
                     <Link
-                      href={post.href}
+                      href={`/blog/${post.slug}`}
                       className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium group/link"
                     >
                       Read More
@@ -430,9 +417,6 @@ export default function BlogPage() {
             </div>
           )}
         </section>
-
-
-
       </div>
     </div>
   );
