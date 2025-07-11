@@ -42,7 +42,7 @@ export default function Header() {
                 <Image
                   src="/logo.png"
                   alt="Wisdom Divine Logo"
-                  fill
+                  fill 
                   className="object-contain"
                   priority
                 />

@@ -34,7 +34,7 @@ export default function AboutSection() {
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          viewport={{ once: true }} 
+          viewport={{ once: true }}  
         >
           <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900">
             About Me

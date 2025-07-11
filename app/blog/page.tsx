@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Calendar, Clock, ArrowUpRight, Tag, Search, Filter } from "lucide-react";
+import { Calendar, Clock, ArrowUpRight, Tag, Search, Filter, X } from "lucide-react";
 
 const blogPosts = [
   {
@@ -115,7 +115,9 @@ export default function BlogPage() {
   const filteredPosts = blogPosts.filter(post => {
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => post.tags.includes(tag));
     
     return matchesCategory && matchesSearch && matchesTags;
@@ -124,13 +126,41 @@ export default function BlogPage() {
   const featuredPosts = blogPosts.filter(post => post.featured);
 
   return (
-    <div className="min-h-screen bg-white pt-24">
-      {/* Subtle background pattern */}
-      <div className="fixed inset-0 opacity-[0.02] pointer-events-none">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25px 25px, #000 2px, transparent 0), radial-gradient(circle at 75px 75px, #000 2px, transparent 0)`,
-          backgroundSize: '100px 100px'
-        }}></div>
+    <div className="min-h-screen bg-white pt-24 relative overflow-hidden">
+      {/* Enhanced animated background - same as about page */}
+      <div className="fixed inset-0 pointer-events-none">
+        {/* Gradient orbs */}
+        <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-br from-blue-400/15 to-purple-400/15 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-20 right-0 w-96 h-96 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-float-delay"></div>
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-gradient-to-br from-emerald-400/15 to-blue-400/15 rounded-full blur-3xl animate-float-slow"></div>
+        <div className="absolute bottom-20 right-1/4 w-64 h-64 bg-gradient-to-br from-yellow-400/10 to-orange-400/10 rounded-full blur-3xl animate-bounce-slow"></div>
+        
+        {/* Grid pattern overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+              linear-gradient(180deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px'
+          }}
+        />
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0">
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className={`absolute w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-15 animate-float-particle-${i % 3}`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 10}s`,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="relative z-10 container mx-auto px-6 py-12 space-y-20">
@@ -145,14 +175,14 @@ export default function BlogPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="inline-block px-4 py-2 bg-blue-50 border border-blue-200 rounded-full text-blue-700 text-sm font-medium mb-6"
+            className="inline-block px-4 py-2 bg-white/80 backdrop-blur-sm border border-blue-200/50 rounded-full text-blue-700 text-sm font-medium mb-6 hover-glow"
           >
             Blog • {blogPosts.length} Articles
           </motion.div>
           
           <h1 className="text-4xl lg:text-6xl font-bold mb-6 text-gray-900 leading-tight">
             Thoughts &{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="gradient-text-rainbow">
               Insights
             </span>
           </h1>
@@ -164,17 +194,30 @@ export default function BlogPage() {
 
           {/* Search and Filters */}
           <div className="max-w-4xl mx-auto space-y-6">
-            {/* Search Bar */}
-            <div className="relative">
+            {/* Enhanced Search Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="relative"
+            >
               <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search articles..."
+                placeholder="Search articles, topics, technologies..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
+                className="w-full pl-12 pr-12 py-4 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-500 hover-glow"
               />
-            </div>
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              )}
+            </motion.div>
 
             {/* Category Filter */}
             <div className="flex flex-wrap justify-center gap-3">
@@ -182,169 +225,124 @@ export default function BlogPage() {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                  className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 hover-scale ${
                     selectedCategory === category
                       ? "bg-blue-600 text-white shadow-lg"
-                      : "bg-gray-100 text-gray-600 hover:text-gray-900 hover:bg-gray-200"
+                      : "bg-white/80 backdrop-blur-sm text-gray-600 hover:text-gray-900 hover:bg-white/90 border border-gray-200/50"
                   }`}
                 >
                   {category}
                 </button>
               ))}
             </div>
+
+            {/* Search Results Counter */}
+            {searchTerm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center"
+              >
+                <p className="text-gray-600">
+                  Found <span className="font-semibold text-blue-600">{filteredPosts.length}</span> article{filteredPosts.length !== 1 ? 's' : ''} 
+                  {searchTerm && ` matching "${searchTerm}"`}
+                </p>
+              </motion.div>
+            )}
           </div>
         </motion.section>
 
         {/* Featured Articles */}
-        <section>
-          <h2 className="text-3xl lg:text-4xl font-bold mb-12 text-center text-gray-900">
-            Featured Articles
-          </h2>
-          <div className="grid lg:grid-cols-2 gap-8 mb-16">
-            {featuredPosts.slice(0, 2).map((post, index) => (
-              <motion.article
-                key={post.id}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="group bg-white border border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all duration-300"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-xs font-medium text-blue-700">Featured</span>
-                </div>
-
-                <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                  <div className="flex items-center gap-1">
-                    <Calendar size={14} />
-                    <span>{new Date(post.date).toLocaleDateString('en-US', { 
-                      month: 'short', 
-                      day: 'numeric', 
-                      year: 'numeric' 
-                    })}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock size={14} />
-                    <span>{post.readTime}</span>
-                  </div>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded font-medium">
-                    {post.category}
-                  </span>
-                </div>
-
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
-                  {post.title}
-                </h3>
-                
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  {post.content}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {post.tags.slice(0, 4).map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-lg font-medium"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <Link
-                  href={post.href}
-                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium group/link"
+        {!searchTerm && (
+          <section>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-12 text-center text-gray-900">
+              Featured Articles
+            </h2>
+            <div className="grid lg:grid-cols-2 gap-8 mb-16">
+              {featuredPosts.slice(0, 2).map((post, index) => (
+                <motion.article
+                  key={post.id}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.2 }}
+                  viewport={{ once: true }}
+                  className="group bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-8 hover:shadow-2xl hover:bg-white transition-all duration-500 hover-glow overflow-hidden relative"
                 >
-                  Read Full Article
-                  <ArrowUpRight size={16} className="group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
-                </Link>
-              </motion.article>
-            ))}
-          </div>
-        </section>
+                  {/* Floating particles */}
+                  <div className="absolute top-4 right-4 w-1.5 h-1.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-0 group-hover:opacity-100 animate-float-particle-0 transition-opacity duration-300"></div>
+                  
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs font-medium text-blue-700">Featured</span>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                    <div className="flex items-center gap-1">
+                      <Calendar size={14} className="group-hover:text-blue-600 transition-colors duration-300" />
+                      <span>{new Date(post.date).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      })}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock size={14} className="group-hover:text-blue-600 transition-colors duration-300" />
+                      <span>{post.readTime}</span>
+                    </div>
+                    <span className="px-2 py-1 bg-gray-100/80 backdrop-blur-sm text-gray-600 text-xs rounded font-medium border border-gray-200/50">
+                      {post.category}
+                    </span>
+                  </div>
+
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
+                    {post.title}
+                  </h3>
+                  
+                  <p className="text-gray-600 mb-6 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                    {post.content}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {post.tags.slice(0, 4).map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1 bg-gray-100/80 backdrop-blur-sm text-gray-700 text-xs rounded-lg font-medium border border-gray-200/50 hover-scale transition-all duration-200 group-hover:bg-blue-50/80 group-hover:text-blue-700"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <Link
+                    href={post.href}
+                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium group/link"
+                  >
+                    Read Full Article
+                    <ArrowUpRight size={16} className="group-hover/link:translate-x-1 group-hover/link:-translate-y-1 transition-transform" />
+                  </Link>
+                </motion.article>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* All Articles */}
         <section>
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
-              All Articles
+              {searchTerm ? 'Search Results' : 'All Articles'}
             </h2>
             <span className="text-gray-500">
               {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''}
             </span>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPosts.map((post, index) => (
-              <motion.article
-                key={post.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group p-6 bg-white border border-gray-200 rounded-xl hover:shadow-lg transition-all duration-300"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg font-medium">
-                    {post.category}
-                  </span>
-                  {post.featured && (
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
-                  <div className="flex items-center gap-1">
-                    <Calendar size={12} />
-                    <span>{new Date(post.date).toLocaleDateString('en-US', { 
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock size={12} />
-                    <span>{post.readTime}</span>
-                  </div>
-                </div>
-
-                <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
-                  {post.title}
-                </h3>
-                
-                <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3">
-                  {post.excerpt}
-                </p>
-
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {post.tags.slice(0, 2).map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded font-medium"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  {post.tags.length > 2 && (
-                    <span className="px-2 py-0.5 text-gray-500 text-xs">
-                      +{post.tags.length - 2}
-                    </span>
-                  )}
-                </div>
-
-                <Link
-                  href={post.href}
-                  className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium group/link"
-                >
-                  Read More
-                  <ArrowUpRight size={14} className="group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
-                </Link>
-              </motion.article>
-            ))}
-          </div>
-
-          {filteredPosts.length === 0 && (
-            <div className="text-center py-12">
+          {filteredPosts.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12"
+            >
               <p className="text-gray-500 text-lg">No articles found matching your search.</p>
               <button
                 onClick={() => {
@@ -352,39 +350,89 @@ export default function BlogPage() {
                   setSelectedCategory("All");
                   setSelectedTags([]);
                 }}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Clear Filters
               </button>
+            </motion.div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredPosts.map((post, index) => (
+                <motion.article
+                  key={post.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group p-6 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-xl hover:shadow-lg hover:bg-white/95 transition-all duration-300 hover-scale relative overflow-hidden"
+                >
+                  {/* Subtle hover effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/3 to-purple-500/3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="px-3 py-1 bg-gray-100/80 backdrop-blur-sm text-gray-600 text-xs rounded-lg font-medium border border-gray-200/50 group-hover:bg-blue-50/80 group-hover:text-blue-600 transition-all duration-200">
+                        {post.category}
+                      </span>
+                      {post.featured && (
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                      <div className="flex items-center gap-1">
+                        <Calendar size={12} className="group-hover:text-blue-600 transition-colors duration-300" />
+                        <span>{new Date(post.date).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock size={12} className="group-hover:text-blue-600 transition-colors duration-300" />
+                        <span>{post.readTime}</span>
+                      </div>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
+                      {post.title}
+                    </h3>
+                    
+                    <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3 group-hover:text-gray-700 transition-colors duration-300">
+                      {post.excerpt}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {post.tags.slice(0, 2).map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2 py-0.5 bg-gray-100/80 backdrop-blur-sm text-gray-600 text-xs rounded font-medium group-hover:bg-blue-50/80 group-hover:text-blue-600 transition-all duration-200"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {post.tags.length > 2 && (
+                        <span className="px-2 py-0.5 text-gray-500 text-xs">
+                          +{post.tags.length - 2}
+                        </span>
+                      )}
+                    </div>
+
+                    <Link
+                      href={post.href}
+                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium group/link"
+                    >
+                      Read More
+                      <ArrowUpRight size={14} className="group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
+                    </Link>
+                  </div>
+                </motion.article>
+              ))}
             </div>
           )}
         </section>
 
-        {/* Newsletter Signup */}
-        <motion.section
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center p-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-2xl"
-        >
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            Stay Updated
-          </h3>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            Get notified when I publish new articles about programming, entrepreneurship, 
-            and building digital solutions for Africa.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
-            />
-            <button className="px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl whitespace-nowrap">
-              Subscribe
-            </button>
-          </div>
-        </motion.section>
+
+
       </div>
     </div>
   );

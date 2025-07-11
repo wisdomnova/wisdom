@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/profile.jpg",
-        width: 1200, 
+        width: 1200,  
         height: 630,
         alt: "Wisdom Divine - Full-Stack Developer and Digital Innovator",
       }, 

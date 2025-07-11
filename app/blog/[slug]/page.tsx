@@ -2,7 +2,7 @@
 
 import { notFound } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, ArrowLeft, Tag, Share2, Github, Linkedin, Twitter } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Tag, Share2, Github, Linkedin, Twitter, Eye, Heart, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { use } from 'react';
 
@@ -260,13 +260,41 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
   const fullContent = getDummyContent(slug);
 
   return (
-    <div className="min-h-screen bg-white pt-24">
-      {/* Subtle background pattern */}
-      <div className="fixed inset-0 opacity-[0.02] pointer-events-none">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 25px 25px, #000 2px, transparent 0), radial-gradient(circle at 75px 75px, #000 2px, transparent 0)`,
-          backgroundSize: '100px 100px'
-        }}></div>
+    <div className="min-h-screen bg-white pt-24 relative overflow-hidden">
+      {/* Enhanced animated background - same as about page */}
+      <div className="fixed inset-0 pointer-events-none">
+        {/* Gradient orbs */}
+        <div className="absolute top-0 left-0 w-72 h-72 bg-gradient-to-br from-blue-400/15 to-purple-400/15 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-20 right-0 w-96 h-96 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-float-delay"></div>
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-gradient-to-br from-emerald-400/15 to-blue-400/15 rounded-full blur-3xl animate-float-slow"></div>
+        <div className="absolute bottom-20 right-1/4 w-64 h-64 bg-gradient-to-br from-yellow-400/10 to-orange-400/10 rounded-full blur-3xl animate-bounce-slow"></div>
+        
+        {/* Grid pattern overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+              linear-gradient(180deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px'
+          }}
+        />
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0">
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className={`absolute w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-15 animate-float-particle-${i % 3}`}
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 10}s`,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="relative z-10 container mx-auto px-6 py-12">
@@ -279,7 +307,7 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
           >
             <Link 
               href="/blog"
-              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl text-blue-600 hover:text-blue-700 hover:bg-white/90 transition-all duration-300 hover-scale"
             >
               <ArrowLeft size={16} />
               Back to Blog
@@ -291,12 +319,26 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mb-12"
+            className="mb-12 p-8 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl hover-glow relative overflow-hidden"
           >
+            {/* Floating particles */}
+            <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-30 animate-float-particle-0"></div>
+            <div className="absolute bottom-4 left-4 w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg opacity-20 animate-float-particle-1 rotate-45"></div>
+
+            {/* Featured Badge */}
+            {post.featured && (
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                <span className="text-xs font-medium text-blue-700 px-3 py-1 bg-blue-50/80 backdrop-blur-sm rounded-full border border-blue-200/50">
+                  Featured Article
+                </span>
+              </div>
+            )}
+
             {/* Meta Information */}
             <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
               <div className="flex items-center gap-1">
-                <Calendar size={14} />
+                <Calendar size={14} className="text-blue-600" />
                 <span>{new Date(post.date).toLocaleDateString('en-US', { 
                   month: 'long', 
                   day: 'numeric', 
@@ -304,10 +346,10 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
                 })}</span>
               </div>
               <div className="flex items-center gap-1">
-                <Clock size={14} />
+                <Clock size={14} className="text-blue-600" />
                 <span>{post.readTime}</span>
               </div>
-              <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg font-medium">
+              <span className="px-3 py-1 bg-gray-100/80 backdrop-blur-sm text-gray-600 text-xs rounded-lg font-medium border border-gray-200/50">
                 {post.category}
               </span>
             </div>
@@ -327,7 +369,7 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-lg font-medium"
+                  className="flex items-center gap-1 px-3 py-1 bg-blue-50/80 backdrop-blur-sm text-blue-700 text-sm rounded-lg font-medium border border-blue-200/50 hover-scale transition-all duration-200"
                 >
                   <Tag size={12} />
                   {tag}
@@ -335,19 +377,36 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
               ))}
             </div>
 
-            {/* Share Buttons */}
-            <div className="flex items-center gap-4 pt-6 border-t border-gray-200">
-              <span className="text-sm font-medium text-gray-600">Share:</span>
-              <div className="flex gap-2">
-                <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                  <Twitter size={16} />
-                </button>
-                <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                  <Linkedin size={16} />
-                </button>
-                <button className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors">
-                  <Share2 size={16} />
-                </button>
+            {/* Stats and Share */}
+            <div className="flex items-center justify-between pt-6 border-t border-gray-200/50">
+              {/* <div className="flex items-center gap-6 text-sm text-gray-500">
+                <div className="flex items-center gap-1">
+                  <Eye size={16} />
+                  <span>2.4k views</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Heart size={16} />
+                  <span>134 likes</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <MessageCircle size={16} />
+                  <span>28 comments</span>
+                </div>
+              </div> */}
+              
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-gray-600">Share:</span>
+                <div className="flex gap-2">
+                  <button className="p-2 bg-gray-100/80 backdrop-blur-sm text-gray-600 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 hover-scale">
+                    <Twitter size={16} />
+                  </button>
+                  <button className="p-2 bg-gray-100/80 backdrop-blur-sm text-gray-600 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 hover-scale">
+                    <Linkedin size={16} />
+                  </button>
+                  <button className="p-2 bg-gray-100/80 backdrop-blur-sm text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-all duration-300 hover-scale">
+                    <Share2 size={16} />
+                  </button>
+                </div>
               </div>
             </div>
           </motion.header>
@@ -357,7 +416,7 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 prose-strong:text-gray-900 prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700"
+            className="mb-16 p-8 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 prose-strong:text-gray-900 prose-code:text-blue-600 prose-code:bg-blue-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:text-gray-700 hover-glow"
           >
             <div 
               dangerouslySetInnerHTML={{ __html: fullContent }} 
@@ -365,35 +424,42 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
             />
           </motion.article>
 
-          {/* Author Bio */}
+          {/* Enhanced Author Bio */}
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mt-16 p-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-2xl"
+            className="mb-12 p-8 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm border border-blue-100/50 rounded-2xl hover-glow relative overflow-hidden"
           >
-            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 rounded-full overflow-hidden bg-white flex items-center justify-center">
+            {/* Background decoration */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/3 to-purple-500/3 opacity-50"></div>
+            
+            {/* Floating particles */}
+            <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-30 animate-float-particle-0"></div>
+            <div className="absolute bottom-4 left-4 w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg opacity-20 animate-float-particle-1 rotate-45"></div>
+            
+            <div className="relative flex items-center gap-6">
+              {/* <div className="w-16 h-16 relative overflow-hidden rounded-xl shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                 <img 
-                  src="/logo.png" 
+                  src="/profile.jpg" 
                   alt="Wisdom Divine Logo" 
-                  className="w-14 h-14 object-contain"
+                  className="object-contain"
                 />
-              </div>
+              </div> */}
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Wisdom Divine</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 leading-relaxed">
                   Full-stack developer building digital solutions for Africa. Currently working on BeeSeek and 
                   helping businesses across Nigeria, Jordan, and Sierra Leone leverage technology for growth.
                 </p>
-                <div className="flex gap-2">
-                  <Link href="https://github.com/wisdomnova" className="p-2 bg-white text-gray-600 rounded-lg hover:text-gray-900 transition-colors">
+                <div className="flex gap-2"> 
+                  <Link href="https://github.com/wisdomnova" className="p-2 bg-white/80 backdrop-blur-sm text-gray-600 rounded-lg hover:text-gray-900 transition-all duration-300 hover-scale border border-white/50">
                     <Github size={16} />
                   </Link>
-                  <Link href="https://linkedin.com/in/wisdomdivine" className="p-2 bg-white text-gray-600 rounded-lg hover:text-blue-600 transition-colors">
+                  <Link href="https://www.linkedin.com/in/wisdom-divine-d-85b234237" className="p-2 bg-white/80 backdrop-blur-sm text-gray-600 rounded-lg hover:text-blue-600 transition-all duration-300 hover-scale border border-white/50">
                     <Linkedin size={16} />
                   </Link>
-                  <Link href="https://twitter.com/wisdomdivine" className="p-2 bg-white text-gray-600 rounded-lg hover:text-blue-400 transition-colors">
+                  <Link href="https://x.com/wisdom_divine_d" className="p-2 bg-white/80 backdrop-blur-sm text-gray-600 rounded-lg hover:text-blue-400 transition-all duration-300 hover-scale border border-white/50">
                     <Twitter size={16} />
                   </Link>
                 </div>
@@ -401,35 +467,64 @@ export default function BlogPost({ params }: { params: Promise<{ slug: string }>
             </div>
           </motion.section>
 
-          {/* Call to Action */}
+          {/* Enhanced Call to Action */}
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="mt-12 text-center p-8 bg-white border border-gray-200 rounded-2xl"
+            className="text-center relative"
           >
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Enjoyed this article?
-            </h3>
-            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              I'd love to hear your thoughts and discuss how we can work together on your next project.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/contact"
-                className="px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
-                Get in Touch
-              </Link>
-              <Link
-                href="/blog"
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-gray-900 hover:text-gray-900 transition-all duration-300"
-              >
-                Read More Articles
-              </Link>
+            {/* Multi-layered background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/8 via-purple-500/8 to-emerald-500/8 rounded-3xl"></div>
+            <div className="absolute inset-0 bg-white/70 backdrop-blur-sm rounded-3xl border border-white/40"></div>
+            
+            {/* Floating decorations */}
+            <div className="absolute top-8 left-12 w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-30 animate-float-particle-0"></div>
+            <div className="absolute bottom-8 right-16 w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg opacity-25 animate-float-particle-1 rotate-45"></div>
+            
+            <div className="relative p-12 rounded-3xl">
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                Enjoyed this <span className="gradient-text">article</span>?
+              </h3>
+              <p className="text-gray-600 mb-8 max-w-2xl mx-auto text-lg leading-relaxed">
+                I'd love to hear your thoughts and discuss how we can work together on your next project. 
+                Let's build something amazing together.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/contact"
+                  className="px-8 py-4 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl magnetic"
+                >
+                  Get in Touch
+                </Link>
+                <Link
+                  href="/blog"
+                  className="px-8 py-4 bg-white/90 backdrop-blur-sm border border-gray-200/50 text-gray-700 rounded-xl font-semibold hover:border-gray-900 hover:text-gray-900 hover:bg-white transition-all duration-300 hover-scale"
+                >
+                  Read More Articles
+                </Link>
+              </div>
+              
+              {/* Newsletter subscription teaser */}
+              {/* <div className="mt-8 pt-8 border-t border-gray-200/50">
+                <p className="text-gray-600 text-sm mb-4">
+                  Want more insights like this? Subscribe to my newsletter for weekly updates.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    className="flex-1 px-4 py-2 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
+                  />
+                  <button className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 whitespace-nowrap hover-scale">
+                    Subscribe
+                  </button>
+                </div>
+              </div> */}
+
             </div>
           </motion.section>
-        </div>
+        </div> 
       </div>
     </div>
   );

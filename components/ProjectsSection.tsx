@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ExternalLink, Github, ArrowUpRight, Smartphone, Globe, Chrome } from "lucide-react";
+import { ExternalLink, Github, ArrowUpRight, Smartphone, Globe, Chrome, Eye } from "lucide-react";
 
 const projects = [
   {
@@ -55,7 +55,7 @@ const projects = [
     featured: false
   } 
 ];
-
+ 
 export default function ProjectsSection() {
   const featuredProjects = projects.filter(p => p.featured);
   const otherProjects = projects.filter(p => !p.featured);
@@ -88,11 +88,11 @@ export default function ProjectsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2 }}
               viewport={{ once: true }}
-              className="group bg-white border border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all duration-300"
+              className="group bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-8 hover:shadow-xl hover:bg-white transition-all duration-300 hover-glow"
             >
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl flex items-center justify-center border border-blue-100">
                     <Icon size={24} className="text-blue-600" />
                   </div>
                   <div>
@@ -107,7 +107,7 @@ export default function ProjectsSection() {
                   {project.live && (
                     <Link
                       href={project.live}
-                      className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      className="p-2 bg-gray-100/80 text-gray-600 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors hover-scale"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -117,7 +117,7 @@ export default function ProjectsSection() {
                   {project.github && (
                     <Link
                       href={project.github}
-                      className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="p-2 bg-gray-100/80 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors hover-scale"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -135,7 +135,7 @@ export default function ProjectsSection() {
                 {project.tech.map((tech) => (
                   <span
                     key={tech}
-                    className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium"
+                    className="px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 text-sm rounded-lg font-medium border border-gray-200/50 hover-scale"
                   >
                     {tech}
                   </span>
@@ -143,12 +143,12 @@ export default function ProjectsSection() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
                   project.status === 'Live' 
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-200'
                     : project.status === 'Coming Soon'
-                    ? 'bg-orange-100 text-orange-700'
-                    : 'bg-blue-100 text-blue-700'
+                    ? 'bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-700 border-orange-200'
+                    : 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200'
                 }`}>
                   {project.status}
                 </span>
@@ -172,9 +172,9 @@ export default function ProjectsSection() {
 
       {/* Other Projects */}
       {otherProjects.length > 0 && (
-        <div>
+        <div className="mb-16">
           <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">More Projects</h3>
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
+          <div className="grid md:grid-cols-3 gap-6">
             {otherProjects.map((project, index) => {
               const Icon = project.icon;
               return (
@@ -184,10 +184,10 @@ export default function ProjectsSection() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300"
+                  className="group bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-xl p-6 hover:shadow-lg hover:bg-white transition-all duration-300"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg flex items-center justify-center border border-gray-200">
                       <Icon size={20} className="text-gray-600" />
                     </div>
                     <div>
@@ -206,7 +206,7 @@ export default function ProjectsSection() {
                     {project.tech.slice(0, 2).map((tech) => (
                       <span
                         key={tech}
-                        className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded font-medium"
+                        className="px-2 py-0.5 bg-gray-100/80 text-gray-600 text-xs rounded font-medium border border-gray-200/50"
                       >
                         {tech}
                       </span>
@@ -219,12 +219,12 @@ export default function ProjectsSection() {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${
                       project.status === 'Live' 
-                        ? 'bg-green-100 text-green-700'
+                        ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border-green-200'
                         : project.status === 'Coming Soon'
-                        ? 'bg-orange-100 text-orange-700'
-                        : 'bg-blue-100 text-blue-700'
+                        ? 'bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-700 border-orange-200'
+                        : 'bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200'
                     }`}>
                       {project.status}
                     </span>
@@ -234,7 +234,7 @@ export default function ProjectsSection() {
                         {project.live && (
                           <Link
                             href={project.live}
-                            className="text-gray-400 hover:text-blue-600 transition-colors"
+                            className="text-gray-400 hover:text-blue-600 transition-colors hover-scale"
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -244,7 +244,7 @@ export default function ProjectsSection() {
                         {project.github && (
                           <Link
                             href={project.github}
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
+                            className="text-gray-400 hover:text-gray-600 transition-colors hover-scale"
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -261,26 +261,71 @@ export default function ProjectsSection() {
         </div>
       )}
 
-      {/* Call to Action */}
+      {/* View All Projects CTA */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-center p-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-2xl"
+        className="text-center mb-16"
       >
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-          Ready to start your project?
-        </h3>
-        <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-          I'm available for new projects and collaborations. Let's discuss how I can help bring your ideas to life.
-        </p>
-        <Link
-          href="/contact"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl"
-        >
-          Get In Touch
-          <ArrowUpRight size={16} />
-        </Link>
+        <div className="p-6 bg-white/90 backdrop-blur-sm border border-gray-200/50 rounded-xl hover:shadow-lg transition-all duration-300 inline-block">
+          <h3 className="text-xl font-semibold text-gray-900 mb-3">
+            Want to see more of my work?
+          </h3>
+          <p className="text-gray-600 mb-4 max-w-md">
+            These are just a few highlights. Check out my complete portfolio with detailed case studies.
+          </p>
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl hover-glow"
+          >
+            <Eye size={16} />
+            View All Projects
+            <ArrowUpRight size={16} />
+          </Link>
+        </div>
+      </motion.div>
+
+      {/* Contact CTA */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="text-center relative"
+      >
+        {/* Background with subtle gradient and glass effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-emerald-500/5 rounded-2xl"></div>
+        <div className="absolute inset-0 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/20"></div>
+        
+        <div className="relative p-8 rounded-2xl">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-blue-200">
+            <ArrowUpRight size={24} className="text-blue-600" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            Ready to start your project?
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-2xl mx-auto leading-relaxed">
+            I'm available for new projects and collaborations. Let's discuss how I can help bring your ideas to life with cutting-edge technology and exceptional user experiences.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl magnetic"
+            >
+              Get In Touch
+              <ArrowUpRight size={16} />
+            </Link>
+            <Link
+              href="https://calendly.com/wisdomdivine3d"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white/80 text-gray-900 rounded-xl font-semibold border border-gray-200 hover:bg-white hover:shadow-lg transition-all duration-300 magnetic"
+            >
+              Schedule a Call
+              <ArrowUpRight size={16} />
+            </Link>
+          </div>
+        </div>
       </motion.div>
     </section>
   );
