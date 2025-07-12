@@ -2,9 +2,9 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Calendar, Clock, ArrowLeft, Share2, Tag, Copy, Check } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Share2, Tag, ExternalLink, Check } from 'lucide-react';
 import { Blog } from '@/types/blog';
-import { useState } from 'react';
+import { JSX, useState } from 'react';
 
 // Static particles to prevent hydration issues
 const staticParticleData = [
@@ -25,7 +25,7 @@ export default function BlogPost({ blog }: BlogPostProps) {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'long',
+      month: 'long', 
       day: 'numeric',
       year: 'numeric'
     });
@@ -81,6 +81,197 @@ export default function BlogPost({ blog }: BlogPostProps) {
       // Last resort: show alert with URL
       alert(`Copy this URL: ${window.location.href}`);
     }
+  };
+
+  // Enhanced markdown parser
+  const parseMarkdown = (text: string) => {
+    let parsed = text;
+    const elements: JSX.Element[] = [];
+    let lastIndex = 0;
+    let elementKey = 0;
+
+    // Function to add text segment
+    const addTextSegment = (content: string, startIndex: number, endIndex: number) => {
+      if (startIndex < endIndex) {
+        const textContent = content.substring(startIndex, endIndex);
+        if (textContent) {
+          elements.push(<span key={`text-${elementKey++}`}>{textContent}</span>);
+        }
+      }
+    };
+
+    // Parse links first [text](url)
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let linkMatch;
+    const linkMatches = [];
+    
+    while ((linkMatch = linkRegex.exec(parsed)) !== null) {
+      linkMatches.push({
+        fullMatch: linkMatch[0],
+        text: linkMatch[1],
+        url: linkMatch[2],
+        index: linkMatch.index,
+        length: linkMatch[0].length
+      });
+    }
+
+    // Parse bold text **text**
+    const boldRegex = /\*\*([^*]+)\*\*/g;
+    let boldMatch;
+    const boldMatches = [];
+    
+    while ((boldMatch = boldRegex.exec(parsed)) !== null) {
+      boldMatches.push({
+        fullMatch: boldMatch[0],
+        text: boldMatch[1],
+        index: boldMatch.index,
+        length: boldMatch[0].length,
+        type: 'bold'
+      });
+    }
+
+    // Parse italic text *text*
+    const italicRegex = /\*([^*]+)\*/g;
+    let italicMatch;
+    const italicMatches = [];
+    
+    while ((italicMatch = italicRegex.exec(parsed)) !== null) {
+      // Skip if it's part of a bold match
+      const isPartOfBold = boldMatches.some(bold => 
+        italicMatch!.index >= bold.index && 
+        italicMatch!.index + italicMatch![0].length <= bold.index + bold.length
+      );
+      
+      if (!isPartOfBold) {
+        italicMatches.push({
+          fullMatch: italicMatch[0],
+          text: italicMatch[1],
+          index: italicMatch.index,
+          length: italicMatch[0].length,
+          type: 'italic'
+        });
+      }
+    }
+
+    // Combine all matches and sort by index
+    const allMatches = [
+      ...linkMatches.map(m => ({ ...m, type: 'link' })),
+      ...boldMatches,
+      ...italicMatches
+    ].sort((a, b) => a.index - b.index);
+
+    // Build the JSX elements
+    allMatches.forEach((match, index) => {
+      // Add text before this match
+      addTextSegment(parsed, lastIndex, match.index);
+
+      // Add the formatted element
+      if (match.type === 'link' && 'url' in match) {
+        const isExternal = match.url.startsWith('http');
+        elements.push(
+          <a
+            key={`link-${elementKey++}`}
+            href={match.url}
+            target={isExternal ? '_blank' : '_self'}
+            rel={isExternal ? 'noopener noreferrer' : undefined}
+            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium underline decoration-blue-300 hover:decoration-blue-500 transition-all duration-200"
+          >
+            {match.text}
+            {isExternal && <ExternalLink size={14} />}
+          </a>
+        );
+      } else if (match.type === 'bold') {
+        elements.push(
+          <strong key={`bold-${elementKey++}`} className="font-bold text-gray-900">
+            {match.text}
+          </strong>
+        );
+      } else if (match.type === 'italic') {
+        elements.push(
+          <em key={`italic-${elementKey++}`} className="italic text-gray-700">
+            {match.text}
+          </em>
+        );
+      }
+
+      lastIndex = match.index + match.length;
+    });
+
+    // Add remaining text
+    addTextSegment(parsed, lastIndex, parsed.length);
+
+    return elements.length > 0 ? elements : parsed;
+  };
+
+  // Enhanced content renderer
+  const renderContent = (content: string) => {
+    return content.split('\n\n').map((paragraph, index) => {
+      // Handle headings
+      if (paragraph.startsWith('## ')) {
+        const headingText = paragraph.replace('## ', '');
+        return (
+          <h2 key={index} className="text-2xl font-bold text-gray-900 mt-8 mb-4 first:mt-0">
+            {parseMarkdown(headingText)}
+          </h2>
+        );
+      }
+      
+      if (paragraph.startsWith('### ')) {
+        const headingText = paragraph.replace('### ', '');
+        return (
+          <h3 key={index} className="text-xl font-bold text-gray-900 mt-6 mb-3">
+            {parseMarkdown(headingText)}
+          </h3>
+        );
+      }
+
+      // Handle bullet points
+      if (paragraph.includes('\n- ')) {
+        const lines = paragraph.split('\n');
+        const listItems = lines.filter(line => line.startsWith('- ')).map((item, itemIndex) => (
+          <li key={itemIndex} className="mb-2">
+            {parseMarkdown(item.replace('- ', ''))}
+          </li>
+        ));
+        
+        const nonListContent = lines.filter(line => !line.startsWith('- ')).join('\n');
+        
+        return (
+          <div key={index} className="mb-6">
+            {nonListContent && (
+              <p className="mb-4 leading-relaxed">
+                {parseMarkdown(nonListContent)}
+              </p>
+            )}
+            <ul className="list-disc list-inside space-y-2 ml-4 text-gray-700">
+              {listItems}
+            </ul>
+          </div>
+        );
+      }
+
+      // Handle special CTA sections (contains emojis and multiple formatting)
+      if (paragraph.includes('👉') || paragraph.includes('🚀') || paragraph.startsWith('*Together,')) {
+        return (
+          <div key={index} className="my-8 p-6 bg-gradient-to-r from-blue-50/80 to-green-50/80 backdrop-blur-sm border-l-4 border-blue-500 rounded-r-xl">
+            <p className="text-lg leading-relaxed font-medium text-gray-800">
+              {parseMarkdown(paragraph)}
+            </p>
+          </div>
+        );
+      }
+
+      // Handle regular paragraphs
+      if (paragraph.trim()) {
+        return (
+          <p key={index} className="mb-4 leading-relaxed">
+            {parseMarkdown(paragraph)}
+          </p>
+        );
+      }
+
+      return null;
+    }).filter(Boolean);
   };
 
   return (
@@ -206,29 +397,7 @@ export default function BlogPost({ blog }: BlogPostProps) {
                   fontSize: '1.1rem'
                 }}
               >
-                {blog.content.split('\n\n').map((paragraph, index) => {
-                  // Handle headings
-                  if (paragraph.startsWith('## ')) {
-                    return (
-                      <h2 key={index} className="text-2xl font-bold text-gray-900 mt-8 mb-4 first:mt-0">
-                        {paragraph.replace('## ', '')}
-                      </h2>
-                    );
-                  }
-                  if (paragraph.startsWith('### ')) {
-                    return (
-                      <h3 key={index} className="text-xl font-bold text-gray-900 mt-6 mb-3">
-                        {paragraph.replace('### ', '')}
-                      </h3>
-                    );
-                  }
-                  // Handle regular paragraphs
-                  return (
-                    <p key={index} className="mb-4 leading-relaxed">
-                      {paragraph}
-                    </p>
-                  );
-                })}
+                {renderContent(blog.content)}
               </div>
             </div>
           </motion.div>
