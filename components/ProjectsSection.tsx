@@ -12,7 +12,7 @@ const projects = [
     github: "https://github.com/wisdomnova/Kazamarka",
     type: "Mobile App",
     icon: Smartphone,
-    status: "Live",
+    status: "Live",  
     featured: true
   },
   {
